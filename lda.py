@@ -81,13 +81,13 @@ def output_top_words(lda_model, words, n=25):
     print("")
 
 def main():
-    n_samples = 10000   # Number of documents (Dutch + English)
+    n_documents = 10000   # Number of documents (Dutch + English)
     n_features = 100  # Number of words in the document?
     n_topics = 10     # Number of topics we want LDA to use
 
     xmlfile = 'Data/wikicomp-2014_ennl.xml'
-    df = parse_data(xmlfile, max_id = n_samples)
-    df_sample = df[:n_samples]
+    df = parse_data(xmlfile, max_id=n_documents)
+    df_sample = df[:n_documents]
     df_english = df_sample[df_sample["language"] == "en"]
     df_dutch = df_sample[df_sample["language"] == "nl"]
 
@@ -97,8 +97,6 @@ def main():
     # TODO: We might need to add stop words ourselves to these lists!
     stopwords_english = get_stop_words('en')
     stopwords_dutch = get_stop_words('nl')
-    print(stopwords_dutch)
-
 
     X_english, words_english = vectorize(corpus_english, n_features, stopwords_english)
     X_dutch, words_dutch = vectorize(corpus_dutch, n_features, stopwords_dutch)
@@ -119,6 +117,9 @@ def main():
     # lda_{language}.components_.shape looks like (n_documents, n_features)
     output_top_words(lda_english, words_english)
     output_top_words(lda_dutch, words_dutch)
+
+
+
 
 if __name__ == "__main__":
     # Prevent scoping issues
