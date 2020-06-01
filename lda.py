@@ -4,7 +4,6 @@ Heavily relying on this tutorial:
 https://scikit-learn.org/stable/auto_examples/applications/plot_topics_extraction_with_nmf_lda.html#sphx-glr-auto-examples-applications-plot-topics-extraction-with-nmf-lda-py
 """
 
-from lxml import etree
 import numpy as np
 import pandas as pd
 from sklearn.cluster import MeanShift
@@ -12,72 +11,14 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.decomposition import LatentDirichletAllocation
 from sklearn.cluster import KMeans
-from stop_words import get_stop_words
 import time
 import math
-
-def parse_data(xmlfile, max_id=10000):
-    """This function reads the data from the specified xml file
-    and outputs a DataFrame with the data.
-    
-    args:
-        xmlfile -- A string containing the path to the xml-file
-        max_id  -- The limit for when we stop parsing.
-                   If max_id == None, we parse through the entire dataset.
-
-    returns:
-        df -- A pandas DataFrame object. The columns are
-              language, name, categories and content
-    """
-    start_time = time.time()
-    print("Parsing dataset...")
-
-    start_tag = None
-    data_list = []
-    for event, element in etree.iterparse(xmlfile, events=('start', 'end'), recover=True):
-        if event == 'start' and start_tag is None:
-            start_tag = element.tag
-        if event == 'end' and element.tag == "articlePair" and (element.attrib.get('id') != None):
-            if max_id is not None and int(element.attrib.get('id')) > max_id:
-                break
-            categories = []
-            for article in element.findall('article'):
-                categories += article.find('categories').get('name').split("|")
-            for article in element.findall('article'):
-                content = ""
-                for content_child in article.find('content'):
-                    if(content_child.text != None):
-                        content += content_child.text
-                a = {"language": article.attrib.get('lang'), "name": article.attrib.get(
-                    'name'), "categories": categories, "content": content}
-                data_list.append(a)
-
-    df = pd.DataFrame(data_list)
-
-    parse_time = time.time() - start_time
-    print(f"Parsing dataset: {xmlfile} took {parse_time} seconds.")
-    return df
-
-def preprocess_stopwords(language):
-    """This function wraps the get_stop_words function imported
-    from the stop_words library. This function also removes all apostrophes, 
-    since the tokens from the corpus won't have these either.
-    If we do not do this, we get a warning.
-
-    args:
-        language -- The language the stopwords come from
-    returns:
-        stop_words -- The list of stop preprocessed stop words
-    """
-    stop_words = get_stop_words(language)
-    for index, word in enumerate(stop_words):
-        stop_words[index] = word.replace("'", "")
-    return stop_words
+import dataset_util
 
 def vectorize(corpus, n_features, stop_words):
     # If a word occurs in more than 75% of the documents, we do not include it
-    vectorizer = TfidfVectorizer(max_df=0.75,
-                                 min_df=5,
+    vectorizer = TfidfVectorizer(max_df=0.95,
+                                 min_df=20,
                                  max_features=n_features,
                                  stop_words=stop_words,
                                  encoding="utf-8")
@@ -102,8 +43,7 @@ def output_top_words(lda_model, words, n=25):
 def generate_clusters(topic_features, n_clusters):
 
     cluster_start_time = time.time()
-
-    # set random state for reproducibility
+    # TODO: We might need a different distance metric (Jensen-Shannon divergence?)
     kmeans = KMeans(n_clusters=n_clusters, n_init=10, random_state=1).fit(topic_features)
     cluster_duration = time.time() - cluster_start_time
     print(f"Clustering took {cluster_duration} seconds")
@@ -155,25 +95,22 @@ def compute_purity(kmeans, n_clusters, categories):
 def main():
     program_start_time = time.time()
 
-    n_documents = 100000   # Number of documents (Dutch + English)
+    n_documents = 10000000   # Number of documents (Dutch + English)
     n_features = 500  # Number of words in the document?
     n_topics = 50    # Number of topics we want LDA to use
 
     xmlfile = 'Data/wikicomp-2014_ennl.xml'
-    df = parse_data(xmlfile, max_id=n_documents)
-    df_sample = df[:n_documents]
-    df_english = df_sample[df_sample["language"] == "en"]
-    df_dutch = df_sample[df_sample["language"] == "nl"]
 
-    # MIGHTDO: We might need to add stop words ourselves to these lists!
-    stopwords_english = preprocess_stopwords('en')
-    stopwords_dutch = preprocess_stopwords('nl')
-
-
+    df_english, df_dutch = dataset_util.process_dataset(xmlfile, n_documents)
     corpus_english = df_english["content"]
-    X_english, words_english = vectorize(corpus_english, n_features, stopwords_english)
-
     corpus_dutch = df_dutch["content"]
+
+    # Vectorize the corpora using a TfidfVectorizer
+    # MIGHTDO: We might need to add stop words ourselves to these lists!
+    stopwords_english = dataset_util.preprocess_stopwords('en')
+    stopwords_dutch = dataset_util.preprocess_stopwords('nl')
+
+    X_english, words_english = vectorize(corpus_english, n_features, stopwords_english)
     X_dutch, words_dutch = vectorize(corpus_dutch, n_features, stopwords_dutch)
 
     # Split in train and test
