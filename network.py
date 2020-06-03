@@ -93,9 +93,10 @@ def main():
     parser.add_argument("-vl", "--vector_length", type=int, default=100, help="The length of the document embedding vectors.")
     parser.add_argument("-nt", "--n_topics", type=int, default=50, help="The number of topics the network should classify into.")
     parser.add_argument("--train", action="store_true")
-    parser.add_argument("-ne", "--n_epochs", type=int, default=100, help="The number of epochs the network should train if --train is specified.")
+    parser.add_argument("-ne", "--n_epochs", type=int, default=25, help="The number of epochs the network should train if --train is specified.")
     parser.add_argument("-f", "--file", default='Data/wikicomp-2014_ennl.xml', help="The dataset file (xml)")
     parser.add_argument("-nd", "--n_documents", type=int, default=10000, help="The maximal number of documents we want to use for training.")
+    parser.add_argument("-lr", "--learning_rate", type=float, default=0.001, help="The learning rate of the Adam optimizer.")
     args = parser.parse_args()
 
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
@@ -128,8 +129,10 @@ def main():
     if args.train:
         # If the user specified train, we instantiate a new network
         network = Network(args.vector_length, len(category_english2idx)).to(device)
+        optimizer = torch.optim.Adam(network.parameters(), lr=args.learning_rate)
         for epoch in range(args.n_epochs):
             for d_index, data in enumerate(documents_english):
+                optimizer.zero_grad()
                 docvec = model_english.infer_vector(data[0])
                 doctensor = torch.Tensor(docvec).to(device)
                 # After having computed the document vector,
@@ -141,6 +144,7 @@ def main():
                 loss = nhot_cross_entropy_loss(raw_topics, target, device)
                 print(f"Epoch #{epoch}: The loss is {loss}")
                 loss.backward()
+                optimizer.step()
 
     else:
         # Load a doc2vec model and network from disk
