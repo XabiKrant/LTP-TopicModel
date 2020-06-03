@@ -55,7 +55,10 @@ def parse_data(xmlfile, max_id=10000):
                 break
             categories = []
             for article in element.findall('article'):
-                categories += article.find('categories').get('name').split("|")
+                category = article.find('categories').get('name').split("|")
+                while '' in category:
+                    category.remove('')
+                categories += category
             for article in element.findall('article'):
                 content = ""
                 for content_child in article.find('content'):
