@@ -79,7 +79,7 @@ parser.add_argument("--verbose", type=int, default=2, help="Verbose level (2:deb
 parser.add_argument("--exp_path", type=str, default="", help="Where to store experiment logs and models")
 parser.add_argument("--exp_name", type=str, default="debug", help="Experiment name")
 parser.add_argument("--exp_id", type=str, default="", help="Experiment ID")
-parser.add_argument("--cuda", type=bool_flag, default=False, help="Run on GPU")
+parser.add_argument("--cuda", action="store_true", help="Run on GPU")
 parser.add_argument("--device", type=str, default="cpu", help="Run on GPU or CPU")
 parser.add_argument("--export", type=str, default="", help="Export embeddings after training (txt / pth)")
 # data
