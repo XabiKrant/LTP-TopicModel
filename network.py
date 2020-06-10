@@ -1,6 +1,7 @@
 """network.py
 """
 
+import os
 import math
 import string
 import argparse
@@ -106,6 +107,11 @@ def main():
 
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     print(f"Device: {device}")
+
+    if not os.path.isdir("SavedModels"):
+        os.mkdir("SavedModels")
+
+    exit()
 
     df_english, df_dutch = dataset_util.process_dataset(args.file, args.n_documents)
     df_english = df_english.reset_index()

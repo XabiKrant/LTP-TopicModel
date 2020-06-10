@@ -23,7 +23,6 @@ from lxml import etree
 import pandas as pd
 from gensim.models.doc2vec import Doc2Vec, TaggedDocument
 
-
 def parse_data(xmlfile, max_id=100):
     """This function reads the data from the specified xml file
     and outputs a DataFrame with the data.
@@ -124,6 +123,7 @@ parser.add_argument("--dico_max_size", type=int, default=0, help="Maximum genera
 parser.add_argument("--src_embs", type=str, nargs='+', default=[], help="Reload source embeddings (should be in the same order as in src_langs)")
 parser.add_argument("--tgt_emb", type=str, default="", help="Reload target embeddings")
 parser.add_argument("--normalize_embeddings", type=str, default="", help="Normalize embeddings before training")
+
 
 
 # parse parameters
