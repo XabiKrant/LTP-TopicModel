@@ -44,7 +44,7 @@ def generate_clusters(topic_features, n_clusters):
     cluster_start_time = time.time()
     kmeans = KMeans(n_clusters=n_clusters, n_init=10, random_state=1).fit(topic_features)
     cluster_duration = time.time() - cluster_start_time
-    print(f"Clustering took {cluster_duration} seconds")
+    print(f"Clustering took {cluster_duration:.3f} seconds")
     return kmeans
 
 def compute_purity(kmeans, n_clusters, categories):
@@ -148,10 +148,10 @@ def main():
     kmeans = generate_clusters(features_both, n_topics)
     purity = compute_purity(kmeans, n_topics, categories_both)
 
-    print(f"The purity of the made clusters is {purity}")
+    print(f"The purity of the made clusters is {purity:.3f}")
 
     program_duration = time.time() - program_start_time
-    print(f"It took {program_duration} seconds to run the entire program.")
+    print(f"It took {program_duration:.3f} seconds to run the entire program.")
 
 
 if __name__ == "__main__":
