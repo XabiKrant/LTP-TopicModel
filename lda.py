@@ -16,7 +16,7 @@ import math
 import dataset_util
 
 def vectorize(corpus, n_features, stop_words):
-    # If a word occurs in more than 75% of the documents, we do not include it
+    # If a word occurs in more than 95% of the documents, we do not include it
     vectorizer = TfidfVectorizer(max_df=0.95,
                                  min_df=20,
                                  max_features=n_features,
@@ -41,9 +41,7 @@ def output_top_words(lda_model, words, n=25):
     print("")
 
 def generate_clusters(topic_features, n_clusters):
-
     cluster_start_time = time.time()
-    # TODO: We might need a different distance metric (Jensen-Shannon divergence?)
     kmeans = KMeans(n_clusters=n_clusters, n_init=10, random_state=1).fit(topic_features)
     cluster_duration = time.time() - cluster_start_time
     print(f"Clustering took {cluster_duration} seconds")
@@ -95,7 +93,7 @@ def compute_purity(kmeans, n_clusters, categories):
 def main():
     program_start_time = time.time()
 
-    n_documents = 10000000   # Number of documents (Dutch + English)
+    n_documents = 10000   # Number of documents (Dutch + English)
     n_features = 500  # Number of words in the document?
     n_topics = 50    # Number of topics we want LDA to use
 
@@ -106,7 +104,6 @@ def main():
     corpus_dutch = df_dutch["content"]
 
     # Vectorize the corpora using a TfidfVectorizer
-    # MIGHTDO: We might need to add stop words ourselves to these lists!
     stopwords_english = dataset_util.preprocess_stopwords('en')
     stopwords_dutch = dataset_util.preprocess_stopwords('nl')
 

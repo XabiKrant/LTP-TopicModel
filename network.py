@@ -102,12 +102,10 @@ def main():
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     print(f"Device: {device}")
 
-    # TODO: get all the documents without categories out of the dataset
     df_english, df_dutch = dataset_util.process_dataset(args.file, args.n_documents)
     unprocessed_corpus_english = list(df_english["content"])
     unprocessed_corpus_dutch = list(df_dutch["content"])
 
-    # MIGHTDO: We might need to add stop words ourselves to these lists!
     stopwords_english = dataset_util.preprocess_stopwords('en')
     stopwords_dutch = dataset_util.preprocess_stopwords('nl')
 
