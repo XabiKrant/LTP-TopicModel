@@ -23,7 +23,7 @@ from lxml import etree
 import pandas as pd
 from gensim.models.doc2vec import Doc2Vec, TaggedDocument
 
-def parse_data(xmlfile, max_id=100):
+def parse_data(xmlfile, max_id=10000):
     """This function reads the data from the specified xml file
     and outputs a DataFrame with the data.
     
@@ -49,7 +49,10 @@ def parse_data(xmlfile, max_id=100):
                 break
             categories = []
             for article in element.findall('article'):
-                categories += article.find('categories').get('name').split("|")
+                category = article.find('categories').get('name').split("|")
+                while '' in category:
+                    category.remove('')
+                categories += category
             for article in element.findall('article'):
                 content = ""
                 for content_child in article.find('content'):
@@ -60,6 +63,16 @@ def parse_data(xmlfile, max_id=100):
                 data_list.append(a)
 
     df = pd.DataFrame(data_list)
+
+    # Get all the rows with singular categories and the empty categories out
+    drop_indices = []
+    for i in range(1, len(df), 2):
+        if df["categories"][i-1-len(drop_indices)] != df["categories"][i-len(drop_indices)]:
+            drop_indices.append(i-1-len(drop_indices))
+    df = df.drop(drop_indices)
+    df = df.reset_index()
+    drop_indices = [i for i, _ in df.iterrows() if len(df.iloc[i]["categories"]) == 0]
+    df = df.drop(drop_indices)
 
     parse_time = time.time() - start_time
     print(f"Parsing dataset: {xmlfile} took {parse_time} seconds.")
