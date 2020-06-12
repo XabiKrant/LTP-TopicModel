@@ -116,7 +116,7 @@ def generate_clusters(topic_features, n_clusters):
     return kmeans
 
 def compute_purity(kmeans, n_clusters, categories):
-    """Purity calculation as defined in """
+    """Purity calculation as defined in Introduction to Information Retrieval."""
     counts_per_cluster = [dict() for i in range(n_clusters)]
     categories = categories.reset_index(drop=True)
 
@@ -153,7 +153,7 @@ def compute_purity_star(kmeans, n_clusters, categories):
     # Average number of categories per data point
     average_n_cats = math.ceil(sum_of_cats / len(categories))
 
-    # Calculate the actual purity
+    # Calculate the actual purity*
     total_numerator = 0
     total_denominator = 0
     for counts in counts_per_cluster:
