@@ -21,7 +21,6 @@ from src.evaluator import Evaluator
 
 import dataset_util
 
-from lxml import etree
 import pandas as pd
 from gensim.models.doc2vec import Doc2Vec, TaggedDocument
 
@@ -61,8 +60,8 @@ parser.add_argument("--dis_smooth", type=float, default=0.1, help="Discriminator
 parser.add_argument("--dis_clip_weights", type=float, default=0, help="Clip discriminator weights (0 to disable)")
 # training adversarial
 parser.add_argument("--adversarial", type=bool_flag, default=True, help="Use adversarial training")
-parser.add_argument("--n_epochs", type=int, default=5, help="Number of epochs")
-parser.add_argument("--epoch_size", type=int, default=1000000, help="Iterations per epoch")
+parser.add_argument("--n_epochs", type=int, default=10, help="Number of epochs")
+parser.add_argument("--epoch_size", type=int, default=20000, help="Iterations per epoch")
 parser.add_argument("--batch_size", type=int, default=32, help="Batch size")
 parser.add_argument("--map_optimizer", type=str, default="sgd,lr=0.1", help="Mapping optimizer")
 parser.add_argument("--dis_optimizer", type=str, default="sgd,lr=0.1", help="Discriminator optimizer")
@@ -130,6 +129,8 @@ df_english, df_dutch = dataset_util.process_dataset(args.file, args.n_documents,
 
 df_english_train = df_english[:int(0.8*df_english.shape[0])]
 df_english_test = df_english[int(0.8*df_english.shape[0]):]
+
+print(df_english.shape[0]+ df_dutch.shape[0])
 df_dutch_train = df_dutch[:int(0.8*df_dutch.shape[0])]
 df_dutch_test = df_dutch[int(0.8*df_dutch.shape[0]):]
 
@@ -188,7 +189,7 @@ if params.adversarial:
 
         # embeddings / discriminator evaluation
         to_log = OrderedDict({'n_epoch': n_epoch})
-        to_log['purity'] = evaluator.purity(to_log, df_train, doc2vec)
+        to_log['purity'], to_log['averaged_purity'] = evaluator.purity(to_log, df_train, doc2vec)
 
         # evaluator.all_eval(to_log)
 

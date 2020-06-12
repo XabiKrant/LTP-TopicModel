@@ -19,10 +19,10 @@ import io
 import fasttext
 import fasttext.util
 import argparse
+from translate import Translator
 
 def multi_lingual_vectorize(corpus, bin_name, vocab):
     ft = fasttext.load_model(bin_name)
-    indptr = [0]
     data = []
     for d in corpus:
         sentence = []
@@ -33,6 +33,27 @@ def multi_lingual_vectorize(corpus, bin_name, vocab):
             data.append(np.mean(sentence, axis=0))
         else:
             data.append([0]*50)
+    return np.array(data)
+
+
+# Implementation to do word by word translation
+# def translate_sentences(corpus):
+#     data = []
+#     translator= Translator(to_lang="English")
+#     for d in corpus:
+#         sentence = []
+#         for term in word_tokenize(d):
+#             sentence.append(translator.translate(term))
+#         data.append(sentence)
+#         print(len(data))
+#     return np.array(data)
+
+
+def translate_sentences(corpus):
+    data = []
+    translator= Translator(to_lang="English")
+    for d in corpus:
+        data.append(translator.translate(d))
     return np.array(data)
 
 
@@ -94,7 +115,7 @@ def compute_purity(kmeans, n_clusters, categories):
     # print(count_dicts)
     dict_sum = 0 
     for label_dict in counts_per_cluster:
-        dict_sum += label_dict[max(label_dict)]
+        dict_sum += max(label_dict.values())
 
     purity = dict_sum/len(categories)
     print(len(categories))
@@ -161,16 +182,19 @@ def main():
     df_english, df_dutch = dataset_util.process_dataset(args.file, args.n_documents, args.top_n_cats)
     corpus_english = df_english["content"]
     corpus_dutch = df_dutch["content"]
+    corpus_dutch_translated = translate_sentences(corpus_dutch)
+
+    assert corpus_dutch_translated.shape == corpus_dutch.shape
     df_all = pd.concat((df_english, df_dutch))
     corpus_all = df_all["content"]
 
     stopwords = dataset_util.construct_stopwords()
 
-
     X_all, words_all = vectorize(corpus_all, args.n_features, stopwords)
     # Vectorize the corpora using a TfidfVectorizer
     X_english, words_english = vectorize(corpus_english, args.n_features, stopwords)
     X_dutch, words_dutch = vectorize(corpus_dutch, args.n_features, stopwords)
+    X_dutch_translated, X_words_dutch_translated = vectorize(corpus_dutch_translated, args.n_features, stopwords)
 
     X_english_emb = multi_lingual_vectorize(corpus_english, 'Data/cc.en.50.bin', words_english)
     X_dutch_emb = multi_lingual_vectorize(corpus_dutch, 'Data/cc.nl.50.bin', words_dutch)
@@ -183,6 +207,10 @@ def main():
     train_X_dutch = X_dutch[:int(0.8*X_dutch.shape[0])]
     test_X_dutch = X_dutch[int(0.8*X_dutch.shape[0]):]
     categories_test_dutch = df_dutch["categories"][int(0.8*X_dutch.shape[0]):]
+
+    train_X_dutch_translated = X_dutch_translated[:int(0.8*X_dutch_translated.shape[0])]
+    test_X_dutch_translated = X_dutch_translated[int(0.8*X_dutch_translated.shape[0]):]
+    categories_test_dutch_translated = df_dutch["categories"][int(0.8*X_dutch_translated.shape[0]):]
 
     train_X_all = X_all[:int(0.8*X_all.shape[0])]
     test_X_all = X_all[int(0.8*X_all.shape[0]):]
@@ -219,6 +247,12 @@ def main():
 
     lda_all.fit(train_X_all)
 
+    lda_translated = LatentDirichletAllocation(n_components=args.n_topics, 
+                                            learning_method = 'online',
+                                            random_state=0)
+
+    lda_translated.fit(train_X_dutch_translated)
+
     
     output_top_words(lda_english, words_english)
     output_top_words(lda_dutch, words_dutch)
@@ -227,11 +261,16 @@ def main():
     # So for each document in the test set, we can say what their distribution over the topics is
     features_english = lda_english.transform(test_X_english)
     features_dutch = lda_dutch.transform(test_X_dutch)
+    features_dutch_translated = lda_translated.transform(test_X_dutch_translated)
     features_all = lda_all.transform(test_X_all)
 
     # Concatenate features and categories
     features_both = np.concatenate((features_english, features_dutch))
     categories_both = pd.concat((categories_test_english, categories_test_dutch))
+
+    # Concatenate features and categories
+    features_both_translated = np.concatenate((features_english, features_dutch_translated))
+    categories_both_translated = pd.concat((categories_test_english, categories_test_dutch_translated))
 
     kmeans = generate_clusters(features_both, args.n_topics)
     purity, averaged_purity = compute_purity(kmeans, args.n_topics, categories_both)
@@ -243,9 +282,17 @@ def main():
 
     kmeans = generate_clusters(features_all, args.n_topics)
     purity, averaged_purity = compute_purity(kmeans, args.n_topics, categories_test_all)
-    max_purity = compute_max_purity(args.n_topics, categories_both)
+    max_purity = compute_max_purity(args.n_topics, categories_test_all)
 
     print("Results for combined vectors")
+    print(f"The purity of the made clusters is {purity:.3f}, the maximum achievable is {max_purity:.3f}")
+    print(f"The averaged purity of the made clusters is {averaged_purity:.3f}\n")
+
+    kmeans = generate_clusters(features_both_translated, args.n_topics)
+    purity, averaged_purity = compute_purity(kmeans, args.n_topics, categories_both_translated)
+    max_purity = compute_max_purity(args.n_topics, categories_both_translated)
+
+    print("Results for translated words")
     print(f"The purity of the made clusters is {purity:.3f}, the maximum achievable is {max_purity:.3f}")
     print(f"The averaged purity of the made clusters is {averaged_purity:.3f}\n")
 

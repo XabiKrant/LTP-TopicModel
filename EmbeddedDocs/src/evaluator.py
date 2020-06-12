@@ -32,46 +32,54 @@ class Evaluator(object):
 
     def compute_purity(self, kmeans, n_clusters, categories):
         """
-        I am not sure how to compute purity in a multilabel problem.
-        Right now, I implement it like this:
+        We are not sure how to compute purity in a multilabel problem.
+        Right now, we implement it like this:
         For each cluster
             For each data point
                 Add all the categories of each data point to the dict
             Calculate average number of categories per data point
-
             Sum the (average number of categories) highest occuring counts
             That is the numerator for this cluster
-
         Then when we have all numerators, we can divide it by the total number
         of categories to get the purity
         """
-        count_dicts = [dict() for i in range(n_clusters)]
+        counts_per_cluster = [dict() for i in range(n_clusters)]
         categories = categories.reset_index(drop=True)
 
         for data_index, label in enumerate(kmeans.labels_):
             for category in categories[data_index]:
                 try:
-                    count_dicts[label][category] += 1
+                    counts_per_cluster[label][category] += 1
                 except KeyError:
-                    count_dicts[label][category] = 1
+                    counts_per_cluster[label][category] = 1
+
+        # print(count_dicts)
+        dict_sum = 0 
+        for label_dict in counts_per_cluster:
+            dict_sum += max(label_dict.values())
+
+        purity = dict_sum/len(categories)
+        print(len(categories))
+
 
         sum_of_cats = 0
         for cat_list in categories:
             sum_of_cats += len(cat_list)
 
+       
         # Average number of categories per data point
         average_n_cats = math.ceil(sum_of_cats / len(categories))
 
         # Calculate the actual purity
         total_numerator = 0
         total_denominator = 0
-        for counts in count_dicts:
+        for counts in counts_per_cluster:
             sorted_values = sorted(counts.values(), reverse=True)
             total_numerator += sum(sorted_values[:average_n_cats])
             total_denominator += sum(sorted_values)
 
-        purity = total_numerator / total_denominator
-        return purity
+        averaged_purity = total_numerator / total_denominator
+        return purity,averaged_purity
 
     def purity(self, to_log, df, doc2vec):
         features = []
@@ -87,5 +95,5 @@ class Evaluator(object):
                 features.append(mapped_emb.detach().numpy())
 
         kmeans = self.generate_clusters(features, 50)
-        purity = self.compute_purity(kmeans, 50, df['categories'])
-        return purity
+        purity, averaged_purity = self.compute_purity(kmeans, 50, df['categories'])
+        return purity, averaged_purity
