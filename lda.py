@@ -22,8 +22,12 @@ import fasttext.util
 import argparse
 
 def multi_lingual_vectorize(corpus, bin_name, vocab):
+    """
+    Vectorize according to the downloadable embeddings from fasttext
+    """
     if os.path.exists(bin_name):
         ft = fasttext.load_model(bin_name)
+        print("Loaded embeddings: " + bin_name)
     else:
         lang = bin_name.split(".")[1]
         print("Downloading embeddings: " + bin_name)
@@ -31,6 +35,7 @@ def multi_lingual_vectorize(corpus, bin_name, vocab):
         ft = fasttext.load_model(filename)
         fasttext.util.reduce_model(ft, 50)
         ft.save_model(bin_name)
+        print("Saved embeddings: " + bin_name)
 
     indptr = [0]
     data = []
@@ -47,6 +52,8 @@ def multi_lingual_vectorize(corpus, bin_name, vocab):
 
 
 def vectorize(corpus, n_features, stop_words):
+    """Vectorizes a corpus of documents with the Tfidf"""
+
     # If a word occurs in more than 75% of the documents, we do not include it
     vectorizer = TfidfVectorizer(max_df=0.75,
                                  min_df=10,
@@ -244,7 +251,7 @@ def main():
 
     print("Results for split vectors")
     print(f"The purity of the made clusters is {purity:.3f}, the maximum achievable is {max_purity:.3f}")
-    print(f"The averaged purity of the made clusters is {purity_stsar:.3f}\n")
+    print(f"The averaged purity of the made clusters is {purity_star:.3f}\n")
 
     kmeans = generate_clusters(features_all, args.n_topics)
     purity = compute_purity(kmeans, args.n_topics, categories_test_all)
@@ -253,7 +260,7 @@ def main():
 
     print("Results for combined vectors")
     print(f"The purity of the made clusters is {purity:.3f}, the maximum achievable is {max_purity:.3f}")
-    print(f"The averaged purity of the made clusters is {purity_stsar:.3f}\n")
+    print(f"The averaged purity of the made clusters is {purity_star:.3f}\n")
 
     if args.embeddings:
         kmeans = generate_clusters(embedded_both, args.n_topics)
@@ -263,7 +270,7 @@ def main():
 
         print("Results for embedded vectors")
         print(f"The purity of the made clusters is {purity:.3f}, the maximum achievable is {max_purity:.3f}")
-        print(f"The averaged purity of the made clusters is {purity_stsar:.3f}\n")
+        print(f"The averaged purity of the made clusters is {purity_star:.3f}\n")
 
     program_duration = time.time() - program_start_time
     print(f"It took {program_duration:.3f} seconds to run the entire program.")
