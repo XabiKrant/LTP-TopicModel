@@ -1,5 +1,4 @@
 """lda.py
-
 Heavily relying on this tutorial:
 https://scikit-learn.org/stable/auto_examples/applications/plot_topics_extraction_with_nmf_lda.html#sphx-glr-auto-examples-applications-plot-topics-extraction-with-nmf-lda-py
 """
@@ -77,10 +76,8 @@ def compute_purity(kmeans, n_clusters, categories):
         For each data point
             Add all the categories of each data point to the dict
         Calculate average number of categories per data point
-
         Sum the (average number of categories) highest occuring counts
         That is the numerator for this cluster
-
     Then when we have all numerators, we can divide it by the total number
     of categories to get the purity
     """
@@ -131,10 +128,8 @@ def compute_max_purity(n_clusters, categories):
         For each data point
             Add all the categories of each data point to the dict
         Calculate average number of categories per data point
-
         Sum the (average number of categories) highest occuring counts
         That is the numerator for this cluster
-
     Then when we have all numerators, we can divide it by the total number
     of categories to get the purity
     """
@@ -172,7 +167,7 @@ def main():
     stopwords = dataset_util.construct_stopwords()
 
 
-    X_all, words_all = vectorize(corpus_all, n_features, stopwords_english)
+    X_all, words_all = vectorize(corpus_all, args.n_features, stopwords)
     # Vectorize the corpora using a TfidfVectorizer
     X_english, words_english = vectorize(corpus_english, args.n_features, stopwords)
     X_dutch, words_dutch = vectorize(corpus_dutch, args.n_features, stopwords)
@@ -218,7 +213,7 @@ def main():
                                           random_state=0)
     lda_dutch.fit(train_X_dutch)
 
-    lda_all = LatentDirichletAllocation(n_components=n_topics, 
+    lda_all = LatentDirichletAllocation(n_components=args.n_topics, 
                                             learning_method = 'online',
                                             random_state=0)
 
@@ -256,7 +251,7 @@ def main():
 
     kmeans = generate_clusters(embedded_both, args.n_topics)
     purity, averaged_purity = compute_purity(kmeans, args.n_topics, categories_embedded_both)
-    max_purity = compute_max_purity(n_topics, categories_embedded_both)
+    max_purity = compute_max_purity(args.n_topics, categories_embedded_both)
 
     print("Results for embedded vectors")
     print(f"The purity of the made clusters is {purity:.3f}, the maximum achievable is {max_purity:.3f}")
