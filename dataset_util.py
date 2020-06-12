@@ -105,6 +105,7 @@ def take_top_N_categories(df, N=300):
 
     sorted_counts = sorted(counts.items(), key=lambda x: x[1], reverse=True)
     top_500_cats = [cat for cat, count in sorted_counts[:N]]
+
     
     drop_indices = []
     for i, row in df.iterrows():
@@ -142,7 +143,7 @@ def construct_stopwords():
     stopwords.extend(get_stop_words('nl'))
     stopcode = ["div", "class", "id", "href", "align", "left", "right", "body", "title", "head",
                 "h1", "h2", "h3", "h4", "h5", "h6", "hr", "br", "html", "img", "jpg", "li", "ol", "ul",
-                "p", "attribute", "tag"]
+                "p", "attribute", "tag", "style"]
     stopwords.extend(stopcode)
     for i in range(2020):
         # Remove all numerals as well, mostly years

@@ -138,7 +138,7 @@ def main():
     parser.add_argument("--train", action="store_true")
     parser.add_argument("--n_epochs", type=int, default=10, help="The number of epochs the network should train if --train is specified.")
     parser.add_argument("-f", "--file", default='Data/wikicomp-2014_ennl.xml', help="The dataset file (xml)")
-    parser.add_argument("--n_documents", type=int, default=10000, help="The maximal number of documents we want to use for training.")
+    parser.add_argument("--n_documents", type=int, default=1000000, help="The maximal number of documents we want to use for training.")
     parser.add_argument("-lr", "--learning_rate", type=float, default=0.001, help="The learning rate of the Adam optimizer.")
     parser.add_argument("--n_features", type=int, default=300, help="The number of units in the last fully connected layer of the network.")
     parser.add_argument("--network_name", default="network.pt", help="The filename of the network to be saved or loaded")

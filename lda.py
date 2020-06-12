@@ -18,7 +18,7 @@ import argparse
 
 def vectorize(corpus, n_features, stop_words):
     # If a word occurs in more than 95% of the documents, we do not include it
-    vectorizer = TfidfVectorizer(max_df=0.95,
+    vectorizer = TfidfVectorizer(max_df=0.5,
                                  min_df=20,
                                  max_features=n_features,
                                  stop_words=stop_words,
@@ -62,15 +62,15 @@ def compute_purity(kmeans, n_clusters, categories):
     Then when we have all numerators, we can divide it by the total number
     of categories to get the purity
     """
-    count_dicts = [dict() for i in range(n_clusters)]
+    counts_per_cluster = [dict() for i in range(n_clusters)]
     categories = categories.reset_index(drop=True)
 
     for data_index, label in enumerate(kmeans.labels_):
         for category in categories[data_index]:
             try:
-                count_dicts[label][category] += 1
+                counts_per_cluster[label][category] += 1
             except KeyError:
-                count_dicts[label][category] = 1
+                counts_per_cluster[label][category] = 1
 
     sum_of_cats = 0
     for cat_list in categories:
@@ -82,7 +82,7 @@ def compute_purity(kmeans, n_clusters, categories):
     # Calculate the actual purity
     total_numerator = 0
     total_denominator = 0
-    for counts in count_dicts:
+    for counts in counts_per_cluster:
         sorted_values = sorted(counts.values(), reverse=True)
         total_numerator += sum(sorted_values[:average_n_cats])
         total_denominator += sum(sorted_values)
@@ -95,7 +95,7 @@ def main():
 
     parser = argparse.ArgumentParser("A neural network which makes use of document embeddings as input.")
     parser.add_argument("-f", "--file", default='Data/wikicomp-2014_ennl.xml', help="The dataset file (xml)")
-    parser.add_argument("--n_documents", type=int, default=10000, help="The maximal number of documents we want to use for training.")
+    parser.add_argument("--n_documents", type=int, default=1000000, help="The maximal number of documents we want to use for training.")
     parser.add_argument("--n_features", type=int, default=1000, help="The number of features TfidfVectorizer will use")
     parser.add_argument("--top_n_cats", type=int, default=300, help="Number of categories used in validation")
     parser.add_argument("--n_topics", type=int, default=50, help="The number of clusters the KMeans algorithm will make.")
