@@ -93,7 +93,7 @@ def compute_purity(kmeans, n_clusters, categories):
 
     # print(count_dicts)
     dict_sum = 0 
-    for label_dict in count_dicts:
+    for label_dict in counts_per_cluster:
         dict_sum += label_dict[max(label_dict)]
 
     purity = dict_sum/len(categories)
