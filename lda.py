@@ -52,7 +52,19 @@ def multi_lingual_vectorize(corpus, bin_name, vocab):
 
 
 def vectorize(corpus, n_features, stop_words):
-    """Vectorizes a corpus of documents with the Tfidf"""
+    """Vectorizes a corpus of documents with the TfidfVectorizer.
+    Words should not occur in more than 75% of documents, and 
+    occur in at least 10 documents.
+    
+    args:
+    corpus -- A sequence of documents
+    n_features -- The numer of features per document
+    stop_words -- The stop words we remove first before vectorizing
+
+    returns:
+    X -- A sequence of document vectors
+    words -- A sequence of the words from the documents
+    """
 
     # If a word occurs in more than 75% of the documents, we do not include it
     vectorizer = TfidfVectorizer(max_df=0.75,
@@ -65,6 +77,14 @@ def vectorize(corpus, n_features, stop_words):
     return X, words
 
 def output_top_words(lda_model, words, n=25):
+    """Outputs the top n words that define a latent topic.
+    n = 25 by default
+
+    args:
+    lda_model -- The LDA object which transformed the documents
+    words -- The sequence of words
+    n -- The number of words that we want to output per topic
+    """
     for topic_index, topic in enumerate(lda_model.components_):
         output_string = f"Topic ({topic_index}): "
         for word_index in topic.argsort()[:-n-1:-1]:
@@ -78,6 +98,17 @@ def output_top_words(lda_model, words, n=25):
     print("")
 
 def generate_clusters(topic_features, n_clusters):
+    """Generates K-Means clusters from the topic features.
+
+    args:
+    topic_features -- The features of the topics to be clustered.
+                      The features can be made using any Machine Learning method.
+    n_cluster -- The number of clusters (k)
+
+    returns:
+    kmeans -- A KMeans object which stores the cluster centroids 
+              and labels of the data points
+    """
     cluster_start_time = time.time()
     kmeans = KMeans(n_clusters=n_clusters, n_init=10, random_state=1).fit(topic_features)
     cluster_duration = time.time() - cluster_start_time
@@ -251,7 +282,7 @@ def main():
 
     print("Results for split vectors")
     print(f"The purity of the made clusters is {purity:.3f}, the maximum achievable is {max_purity:.3f}")
-    print(f"The averaged purity of the made clusters is {purity_star:.3f}\n")
+    print(f"The purity* of the made clusters is {purity_star:.3f}\n")
 
     kmeans = generate_clusters(features_all, args.n_topics)
     purity = compute_purity(kmeans, args.n_topics, categories_test_all)
@@ -260,7 +291,7 @@ def main():
 
     print("Results for combined vectors")
     print(f"The purity of the made clusters is {purity:.3f}, the maximum achievable is {max_purity:.3f}")
-    print(f"The averaged purity of the made clusters is {purity_star:.3f}\n")
+    print(f"The purity* of the made clusters is {purity_star:.3f}\n")
 
     if args.embeddings:
         kmeans = generate_clusters(embedded_both, args.n_topics)
@@ -270,7 +301,7 @@ def main():
 
         print("Results for embedded vectors")
         print(f"The purity of the made clusters is {purity:.3f}, the maximum achievable is {max_purity:.3f}")
-        print(f"The averaged purity of the made clusters is {purity_star:.3f}\n")
+        print(f"The purity* of the made clusters is {purity_star:.3f}\n")
 
     program_duration = time.time() - program_start_time
     print(f"It took {program_duration:.3f} seconds to run the entire program.")

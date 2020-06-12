@@ -13,7 +13,7 @@ from gensim.test.utils import common_texts
 from gensim.models.doc2vec import Doc2Vec, TaggedDocument
 import numpy as np
 import dataset_util
-from lda import generate_clusters, compute_purity
+from lda import generate_clusters, compute_purity, compute_purity_star
 import pandas as pd
 
 class Network(nn.Module):
@@ -127,7 +127,9 @@ def test(
 
     kmeans = generate_clusters(features_both, args.n_topics)
     purity = compute_purity(kmeans, args.n_topics, categories_both)
-    print(f"The purity of the made clusters is {purity:.3f}")
+    purity_star = compute_purity_star(kmeans, args.n_topics, categories_both)
+    print(f"The purity of the made clusters is {purity:.3f}\n"
+          f" The purity* of the made clusters is {purity_star:.3f}")
 
 def main():
     program_start_time = time.time()

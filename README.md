@@ -25,3 +25,11 @@ To run the LDA implementation with embeddings (NOTE: The downloads of these embe
 python3 lda.py --embeddings
 ```
 
+To train and test the neural approach, use the following command, with --cuda if you would like to use your GPU:
+```bash
+python3 network.py --train [--cuda]
+```
+The command above will also save the network, so if you want to just test that network, you can do so with:
+```bash
+python3 network.py [--cuda]
+```
