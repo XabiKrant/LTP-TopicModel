@@ -19,64 +19,11 @@ from src.models import build_model
 from src.trainer import Trainer
 from src.evaluator import Evaluator
 
+import dataset_util
+
 from lxml import etree
 import pandas as pd
 from gensim.models.doc2vec import Doc2Vec, TaggedDocument
-
-def parse_data(xmlfile, max_id=10000):
-    """This function reads the data from the specified xml file
-    and outputs a DataFrame with the data.
-    
-    args:
-        xmlfile -- A string containing the path to the xml-file
-        max_id  -- The limit for when we stop parsing.
-                   If max_id == None, we parse through the entire dataset.
-
-    returns:
-        df -- A pandas DataFrame object. The columns are
-              language, name, categories and content
-    """
-    start_time = time.time()
-    print("Parsing dataset...")
-
-    start_tag = None
-    data_list = []
-    for event, element in etree.iterparse(xmlfile, events=('start', 'end'), recover=True):
-        if event == 'start' and start_tag is None:
-            start_tag = element.tag
-        if event == 'end' and element.tag == "articlePair" and (element.attrib.get('id') != None):
-            if max_id is not None and int(element.attrib.get('id')) > max_id:
-                break
-            categories = []
-            for article in element.findall('article'):
-                category = article.find('categories').get('name').split("|")
-                while '' in category:
-                    category.remove('')
-                categories += category
-            for article in element.findall('article'):
-                content = ""
-                for content_child in article.find('content'):
-                    if(content_child.text != None):
-                        content += content_child.text
-                a = {"language": article.attrib.get('lang'), "name": article.attrib.get(
-                    'name'), "categories": categories, "content": content}
-                data_list.append(a)
-
-    df = pd.DataFrame(data_list)
-
-    # Get all the rows with singular categories and the empty categories out
-    drop_indices = []
-    for i in range(1, len(df), 2):
-        if df["categories"][i-1-len(drop_indices)] != df["categories"][i-len(drop_indices)]:
-            drop_indices.append(i-1-len(drop_indices))
-    df = df.drop(drop_indices)
-    df = df.reset_index()
-    drop_indices = [i for i, _ in df.iterrows() if len(df.iloc[i]["categories"]) == 0]
-    df = df.drop(drop_indices)
-
-    parse_time = time.time() - start_time
-    print(f"Parsing dataset: {xmlfile} took {parse_time} seconds.")
-    return df
 
 
 VALIDATION_METRIC = 'purity'
@@ -97,7 +44,7 @@ parser.add_argument("--export", type=str, default="", help="Export embeddings af
 # data
 parser.add_argument("--src_langs", type=str, nargs='+', default=['nl'], help="Source languages")
 parser.add_argument("--tgt_lang", type=str, default='en', help="Target language")
-parser.add_argument("--emb_dim", type=int, default=300, help="Embedding dimension")
+parser.add_argument("--emb_dim", type=int, default=50, help="Embedding dimension")
 parser.add_argument("--max_vocab", type=int, default=-1, help="Maximum vocabulary size (-1 to disable)")
 # mapping
 parser.add_argument("--map_id_init", type=bool_flag, default=True, help="Initialize the mapping as an identity matrix")
@@ -115,7 +62,7 @@ parser.add_argument("--dis_clip_weights", type=float, default=0, help="Clip disc
 # training adversarial
 parser.add_argument("--adversarial", type=bool_flag, default=True, help="Use adversarial training")
 parser.add_argument("--n_epochs", type=int, default=5, help="Number of epochs")
-parser.add_argument("--epoch_size", type=int, default=100000, help="Iterations per epoch")
+parser.add_argument("--epoch_size", type=int, default=1000000, help="Iterations per epoch")
 parser.add_argument("--batch_size", type=int, default=32, help="Batch size")
 parser.add_argument("--map_optimizer", type=str, default="sgd,lr=0.1", help="Mapping optimizer")
 parser.add_argument("--dis_optimizer", type=str, default="sgd,lr=0.1", help="Discriminator optimizer")
@@ -137,6 +84,13 @@ parser.add_argument("--src_embs", type=str, nargs='+', default=[], help="Reload 
 parser.add_argument("--tgt_emb", type=str, default="", help="Reload target embeddings")
 parser.add_argument("--normalize_embeddings", type=str, default="", help="Normalize embeddings before training")
 
+
+parser.add_argument("-f", "--file", default='../Data/wikicomp-2014_ennl.xml', help="The dataset file (xml)")
+parser.add_argument("--n_documents", type=int, default=10000, help="The maximal number of documents we want to use for training.")
+parser.add_argument("--n_features", type=int, default=1000, help="The number of features TfidfVectorizer will use")
+parser.add_argument("--top_n_cats", type=int, default=300, help="Number of categories used in validation")
+parser.add_argument("--n_topics", type=int, default=50, help="The number of clusters the KMeans algorithm will make.")
+args = parser.parse_args()
 
 
 # parse parameters
@@ -171,18 +125,23 @@ n_documents = 100000   # Number of documents (Dutch + English)
 n_features = 500  # Number of words in the document?
 n_topics = 50    # Number of topics we want LDA to use
 
-xmlfile = './Data/wikicomp-2014_ennl.xml'
-df = parse_data(xmlfile, max_id=n_documents)
-df_train = df[:n_documents]
+xmlfile = '../Data/wikicomp-2014_ennl.xml'
+df_english, df_dutch = dataset_util.process_dataset(args.file, args.n_documents, args.top_n_cats)
 
-df_english = df_train[df_train["language"] == "en"]
-df_dutch = df_train[df_train["language"] == "nl"]
+df_english_train = df_english[:int(0.8*df_english.shape[0])]
+df_english_test = df_english[int(0.8*df_english.shape[0]):]
+df_dutch_train = df_dutch[:int(0.8*df_dutch.shape[0])]
+df_dutch_test = df_dutch[int(0.8*df_dutch.shape[0]):]
+
+df_train = pd.concat((df_english_train, df_dutch_train))
+df_test = pd.concat((df_english_test, df_dutch_test))
+
 doc2vec = {}
 
-english_documents = [TaggedDocument(doc, [i]) for i, doc in enumerate(df_english["content"])]
+english_documents = [TaggedDocument(doc, [i]) for i, doc in enumerate(df_english_train["content"])]
 doc2vec['en'] = Doc2Vec(english_documents, vector_size=params.emb_dim, window=2, min_count=1, workers=4)
 
-dutch_documents = [TaggedDocument(doc, [i]) for i, doc in enumerate(df_dutch["content"])]
+dutch_documents = [TaggedDocument(doc, [i]) for i, doc in enumerate(df_dutch_train["content"])]
 doc2vec['nl'] = Doc2Vec(dutch_documents, vector_size=params.emb_dim, window=2, min_count=1, workers=4)
 
 embs, mappings, discriminators = build_model(params, True, df_train, doc2vec)
@@ -247,7 +206,16 @@ if params.adversarial:
             break
 
 
-# export embeddings
-if params.export:
-    trainer.reload_best()
-    trainer.export()
+english_documents = [TaggedDocument(doc, [i]) for i, doc in enumerate(df_english_test["content"])]
+doc2vec['en'] = Doc2Vec(english_documents, vector_size=params.emb_dim, window=2, min_count=1, workers=4)
+
+dutch_documents = [TaggedDocument(doc, [i]) for i, doc in enumerate(df_dutch_test["content"])]
+doc2vec['nl'] = Doc2Vec(dutch_documents, vector_size=params.emb_dim, window=2, min_count=1, workers=4)
+
+embs, mappings, discriminators = build_model(params, True, df_test, doc2vec)
+trainer.reload_best()
+trainer.embs = embs
+evaluator = Evaluator(trainer)
+
+
+print("Total purity achieved: ", evaluator.purity(to_log, df_train, doc2vec))
