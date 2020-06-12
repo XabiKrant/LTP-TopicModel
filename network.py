@@ -13,7 +13,7 @@ from gensim.test.utils import common_texts
 from gensim.models.doc2vec import Doc2Vec, TaggedDocument
 import numpy as np
 import dataset_util
-from lda import generate_clusters, compute_purity
+from lda import generate_clusters, compute_purity, compute_purity_star
 import pandas as pd
 
 class Network(nn.Module):
@@ -127,13 +127,15 @@ def test(
 
     kmeans = generate_clusters(features_both, args.n_topics)
     purity = compute_purity(kmeans, args.n_topics, categories_both)
-    print(f"The purity of the made clusters is {purity:.3f}")
+    purity_star = compute_purity_star(kmeans, args.n_topics, categories_both)
+    print(f"The purity of the made clusters is {purity:.3f}\n"
+          f"The purity* of the made clusters is {purity_star:.3f}")
 
 def main():
     program_start_time = time.time()
 
     parser = argparse.ArgumentParser("A neural network which makes use of document embeddings as input.")
-    parser.add_argument("--vector_length", type=int, default=100, help="The length of the document embedding vectors.")
+    parser.add_argument("--vector_length", type=int, default=300, help="The length of the document embedding vectors.")
     parser.add_argument("--n_topics", type=int, default=50, help="The number of clusters the KMeans should make.")
     parser.add_argument("--train", action="store_true")
     parser.add_argument("--n_epochs", type=int, default=10, help="The number of epochs the network should train if --train is specified.")

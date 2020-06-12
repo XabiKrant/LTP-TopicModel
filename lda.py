@@ -3,6 +3,7 @@ Heavily relying on this tutorial:
 https://scikit-learn.org/stable/auto_examples/applications/plot_topics_extraction_with_nmf_lda.html#sphx-glr-auto-examples-applications-plot-topics-extraction-with-nmf-lda-py
 """
 
+import os
 import numpy as np
 import pandas as pd
 from sklearn.cluster import MeanShift
@@ -23,6 +24,22 @@ from translate import Translator
 
 def multi_lingual_vectorize(corpus, bin_name, vocab):
     ft = fasttext.load_model(bin_name)
+    """
+    Vectorize according to the downloadable embeddings from fasttext
+    """
+    if os.path.exists(bin_name):
+        ft = fasttext.load_model(bin_name)
+        print("Loaded embeddings: " + bin_name)
+    else:
+        lang = bin_name.split(".")[1]
+        print("Downloading embeddings: " + bin_name)
+        filename = fasttext.util.download_model(lang, if_exists='ignore')
+        ft = fasttext.load_model(filename)
+        fasttext.util.reduce_model(ft, 50)
+        ft.save_model(bin_name)
+        print("Saved embeddings: " + bin_name)
+
+    indptr = [0]
     data = []
     for d in corpus:
         sentence = []
@@ -58,6 +75,20 @@ def translate_sentences(corpus):
 
 
 def vectorize(corpus, n_features, stop_words):
+    """Vectorizes a corpus of documents with the TfidfVectorizer.
+    Words should not occur in more than 75% of documents, and 
+    occur in at least 10 documents.
+    
+    args:
+    corpus -- A sequence of documents
+    n_features -- The numer of features per document
+    stop_words -- The stop words we remove first before vectorizing
+
+    returns:
+    X -- A sequence of document vectors
+    words -- A sequence of the words from the documents
+    """
+
     # If a word occurs in more than 75% of the documents, we do not include it
     vectorizer = TfidfVectorizer(max_df=0.75,
                                  min_df=10,
@@ -68,8 +99,15 @@ def vectorize(corpus, n_features, stop_words):
     words = vectorizer.get_feature_names()
     return X, words
 
-
 def output_top_words(lda_model, words, n=25):
+    """Outputs the top n words that define a latent topic.
+    n = 25 by default
+
+    args:
+    lda_model -- The LDA object which transformed the documents
+    words -- The sequence of words
+    n -- The number of words that we want to output per topic
+    """
     for topic_index, topic in enumerate(lda_model.components_):
         output_string = f"Topic ({topic_index}): "
         for word_index in topic.argsort()[:-n-1:-1]:
@@ -83,6 +121,17 @@ def output_top_words(lda_model, words, n=25):
     print("")
 
 def generate_clusters(topic_features, n_clusters):
+    """Generates K-Means clusters from the topic features.
+
+    args:
+    topic_features -- The features of the topics to be clustered.
+                      The features can be made using any Machine Learning method.
+    n_cluster -- The number of clusters (k)
+
+    returns:
+    kmeans -- A KMeans object which stores the cluster centroids 
+              and labels of the data points
+    """
     cluster_start_time = time.time()
     kmeans = KMeans(n_clusters=n_clusters, n_init=10, random_state=1).fit(topic_features)
     cluster_duration = time.time() - cluster_start_time
@@ -90,18 +139,7 @@ def generate_clusters(topic_features, n_clusters):
     return kmeans
 
 def compute_purity(kmeans, n_clusters, categories):
-    """
-    We are not sure how to compute purity in a multilabel problem.
-    Right now, we implement it like this:
-    For each cluster
-        For each data point
-            Add all the categories of each data point to the dict
-        Calculate average number of categories per data point
-        Sum the (average number of categories) highest occuring counts
-        That is the numerator for this cluster
-    Then when we have all numerators, we can divide it by the total number
-    of categories to get the purity
-    """
+    """Purity calculation as defined in Introduction to Information Retrieval."""
     counts_per_cluster = [dict() for i in range(n_clusters)]
     categories = categories.reset_index(drop=True)
 
@@ -112,24 +150,33 @@ def compute_purity(kmeans, n_clusters, categories):
             except KeyError:
                 counts_per_cluster[label][category] = 1
 
-    # print(count_dicts)
     dict_sum = 0 
     for label_dict in counts_per_cluster:
         dict_sum += max(label_dict.values())
 
     purity = dict_sum/len(categories)
-    print(len(categories))
+    return purity
 
+def compute_purity_star(kmeans, n_clusters, categories):
+    """An attempt at a multilabel purity computation."""
+    counts_per_cluster = [dict() for i in range(n_clusters)]
+    categories = categories.reset_index(drop=True)
+
+    for data_index, label in enumerate(kmeans.labels_):
+        for category in categories[data_index]:
+            try:
+                counts_per_cluster[label][category] += 1
+            except KeyError:
+                counts_per_cluster[label][category] = 1
 
     sum_of_cats = 0
     for cat_list in categories:
         sum_of_cats += len(cat_list)
 
-   
     # Average number of categories per data point
     average_n_cats = math.ceil(sum_of_cats / len(categories))
 
-    # Calculate the actual purity
+    # Calculate the actual purity*
     total_numerator = 0
     total_denominator = 0
     for counts in counts_per_cluster:
@@ -137,23 +184,12 @@ def compute_purity(kmeans, n_clusters, categories):
         total_numerator += sum(sorted_values[:average_n_cats])
         total_denominator += sum(sorted_values)
 
-    averaged_purity = total_numerator / total_denominator
-    return purity,averaged_purity
+    purity_star = total_numerator / total_denominator
+    return purity_star
 
 
 def compute_max_purity(n_clusters, categories):
-    """
-    I am not sure how to compute purity in a multilabel problem.
-    Right now, I implement it like this:
-    For each cluster
-        For each data point
-            Add all the categories of each data point to the dict
-        Calculate average number of categories per data point
-        Sum the (average number of categories) highest occuring counts
-        That is the numerator for this cluster
-    Then when we have all numerators, we can divide it by the total number
-    of categories to get the purity
-    """
+    """"""
     count_dicts = {}
     categories = categories.reset_index(drop=True)
 
@@ -177,7 +213,15 @@ def main():
     parser.add_argument("--n_features", type=int, default=1000, help="The number of features TfidfVectorizer will use")
     parser.add_argument("--top_n_cats", type=int, default=300, help="Number of categories used in validation")
     parser.add_argument("--n_topics", type=int, default=50, help="The number of clusters the KMeans algorithm will make.")
+    parser.add_argument("--embeddings", action="store_true", help="Whether to download word embeddings from the internet. This WILL take a long time.")
     args = parser.parse_args()
+
+    if args.embeddings:
+        print("It is possible to run the program without embeddings if you think the download takes too long."
+              " Please rerun the program without the --embeddings option.")
+    else:
+        print("It is possible to run the program with embeddings, but the download WILL take a long time."
+              " If you still want to try this, please rerun the program with the --embeddings option.")
 
     df_english, df_dutch = dataset_util.process_dataset(args.file, args.n_documents, args.top_n_cats)
     corpus_english = df_english["content"]
@@ -196,9 +240,6 @@ def main():
     X_dutch, words_dutch = vectorize(corpus_dutch, args.n_features, stopwords)
     X_dutch_translated, X_words_dutch_translated = vectorize(corpus_dutch_translated, args.n_features, stopwords)
 
-    X_english_emb = multi_lingual_vectorize(corpus_english, 'Data/cc.en.50.bin', words_english)
-    X_dutch_emb = multi_lingual_vectorize(corpus_dutch, 'Data/cc.nl.50.bin', words_dutch)
-
     # Split in train and test
     train_X_english = X_english[:int(0.8*X_english.shape[0])]
     test_X_english = X_english[int(0.8*X_english.shape[0]):]
@@ -216,18 +257,21 @@ def main():
     test_X_all = X_all[int(0.8*X_all.shape[0]):]
     categories_test_all = df_all["categories"][int(0.8*X_all.shape[0]):]
 
-    train_X_english_emb = X_english_emb[:int(0.8*X_english_emb.shape[0])]
-    test_X_english_emb = X_english_emb[int(0.8*X_english_emb.shape[0]):]
-    categories_test_english_emb = df_english["categories"][int(0.8*X_english_emb.shape[0]):]
+    if args.embeddings:
+        X_english_emb = multi_lingual_vectorize(corpus_english, 'Data/cc.en.50.bin', words_english)
+        X_dutch_emb = multi_lingual_vectorize(corpus_dutch, 'Data/cc.nl.50.bin', words_dutch)
 
-    train_X_dutch_emb = X_dutch_emb[:int(0.8*X_dutch_emb.shape[0])]
-    test_X_dutch_emb = X_dutch_emb[int(0.8*X_dutch_emb.shape[0]):]
-    categories_test_dutch_emb = df_dutch["categories"][int(0.8*X_dutch_emb.shape[0]):]
-    embedded_both = np.concatenate((test_X_english_emb, test_X_dutch_emb))
-    categories_embedded_both = pd.concat((categories_test_english_emb, categories_test_dutch_emb))
+        train_X_english_emb = X_english_emb[:int(0.8*X_english_emb.shape[0])]
+        test_X_english_emb = X_english_emb[int(0.8*X_english_emb.shape[0]):]
+        categories_test_english_emb = df_english["categories"][int(0.8*X_english_emb.shape[0]):]
+
+        train_X_dutch_emb = X_dutch_emb[:int(0.8*X_dutch_emb.shape[0])]
+        test_X_dutch_emb = X_dutch_emb[int(0.8*X_dutch_emb.shape[0]):]
+        categories_test_dutch_emb = df_dutch["categories"][int(0.8*X_dutch_emb.shape[0]):]
+        embedded_both = np.concatenate((test_X_english_emb, test_X_dutch_emb))
+        categories_embedded_both = pd.concat((categories_test_english_emb, categories_test_dutch_emb))
 
 
-    # train_X_english_multi = multi_lingual_vectorize(corpus_english, "Data/cc.en.300.vec")
     # learning_method should be set to 'online' for large datasets
     # random_state set to 0 so we can reproduce results
     lda_english = LatentDirichletAllocation(n_components=args.n_topics, 
@@ -273,36 +317,42 @@ def main():
     categories_both_translated = pd.concat((categories_test_english, categories_test_dutch_translated))
 
     kmeans = generate_clusters(features_both, args.n_topics)
-    purity, averaged_purity = compute_purity(kmeans, args.n_topics, categories_both)
+    purity = compute_purity(kmeans, args.n_topics, categories_both)
+    purity_star = compute_purity_star(kmeans, args.n_topics, categories_both)
     max_purity = compute_max_purity(args.n_topics, categories_both)
 
-    print("Results for splitted vectors")
+    print("Results for split vectors")
     print(f"The purity of the made clusters is {purity:.3f}, the maximum achievable is {max_purity:.3f}")
-    print(f"The averaged purity of the made clusters is {averaged_purity:.3f}\n")
+    print(f"The purity* of the made clusters is {purity_star:.3f}\n")
 
     kmeans = generate_clusters(features_all, args.n_topics)
-    purity, averaged_purity = compute_purity(kmeans, args.n_topics, categories_test_all)
+    purity = compute_purity(kmeans, args.n_topics, categories_test_all)
+    purity_star = compute_purity_star(kmeans, args.n_topics, categories_test_all)
     max_purity = compute_max_purity(args.n_topics, categories_test_all)
 
     print("Results for combined vectors")
     print(f"The purity of the made clusters is {purity:.3f}, the maximum achievable is {max_purity:.3f}")
-    print(f"The averaged purity of the made clusters is {averaged_purity:.3f}\n")
+    print(f"The purity* of the made clusters is {purity_star:.3f}\n")
 
     kmeans = generate_clusters(features_both_translated, args.n_topics)
-    purity, averaged_purity = compute_purity(kmeans, args.n_topics, categories_both_translated)
+    purity = compute_purity(kmeans, args.n_topics, categories_both_translated)
+    purity_star = compute_purity_star(kmeans, args.n_topics, categories_both_translated)
     max_purity = compute_max_purity(args.n_topics, categories_both_translated)
 
     print("Results for translated words")
     print(f"The purity of the made clusters is {purity:.3f}, the maximum achievable is {max_purity:.3f}")
-    print(f"The averaged purity of the made clusters is {averaged_purity:.3f}\n")
+    print(f"The purity* of the made clusters is {purity_star:.3f}\n")
 
-    kmeans = generate_clusters(embedded_both, args.n_topics)
-    purity, averaged_purity = compute_purity(kmeans, args.n_topics, categories_embedded_both)
-    max_purity = compute_max_purity(args.n_topics, categories_embedded_both)
+    if args.embeddings:
+        kmeans = generate_clusters(embedded_both, args.n_topics)
+        purity = compute_purity(kmeans, args.n_topics, categories_embedded_both)
+        purity_star = compute_purity_star(kmeans, args.n_topics, categories_embedded_both)
+        max_purity = compute_max_purity(args.n_topics, categories_embedded_both)
 
-    print("Results for embedded vectors")
-    print(f"The purity of the made clusters is {purity:.3f}, the maximum achievable is {max_purity:.3f}")
-    print(f"The averaged purity of the made clusters is {averaged_purity:.3f}\n")
+
+        print("Results for embedded vectors")
+        print(f"The purity of the made clusters is {purity:.3f}, the maximum achievable is {max_purity:.3f}")
+        print(f"The purity* of the made clusters is {purity_star:.3f}\n")
 
     program_duration = time.time() - program_start_time
     print(f"It took {program_duration:.3f} seconds to run the entire program.")
