@@ -115,7 +115,7 @@ parser.add_argument("--dis_clip_weights", type=float, default=0, help="Clip disc
 # training adversarial
 parser.add_argument("--adversarial", type=bool_flag, default=True, help="Use adversarial training")
 parser.add_argument("--n_epochs", type=int, default=5, help="Number of epochs")
-parser.add_argument("--epoch_size", type=int, default=4000, help="Iterations per epoch")
+parser.add_argument("--epoch_size", type=int, default=100000, help="Iterations per epoch")
 parser.add_argument("--batch_size", type=int, default=32, help="Batch size")
 parser.add_argument("--map_optimizer", type=str, default="sgd,lr=0.1", help="Mapping optimizer")
 parser.add_argument("--dis_optimizer", type=str, default="sgd,lr=0.1", help="Discriminator optimizer")
@@ -171,7 +171,7 @@ n_documents = 100000   # Number of documents (Dutch + English)
 n_features = 500  # Number of words in the document?
 n_topics = 50    # Number of topics we want LDA to use
 
-xmlfile = '../Data/wikicomp-2014_ennl.xml'
+xmlfile = './Data/wikicomp-2014_ennl.xml'
 df = parse_data(xmlfile, max_id=n_documents)
 df_train = df[:n_documents]
 
