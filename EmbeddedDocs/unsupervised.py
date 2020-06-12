@@ -23,8 +23,7 @@ from lxml import etree
 import pandas as pd
 from gensim.models.doc2vec import Doc2Vec, TaggedDocument
 
-
-def parse_data(xmlfile, max_id=100):
+def parse_data(xmlfile, max_id=10000):
     """This function reads the data from the specified xml file
     and outputs a DataFrame with the data.
     
@@ -50,7 +49,10 @@ def parse_data(xmlfile, max_id=100):
                 break
             categories = []
             for article in element.findall('article'):
-                categories += article.find('categories').get('name').split("|")
+                category = article.find('categories').get('name').split("|")
+                while '' in category:
+                    category.remove('')
+                categories += category
             for article in element.findall('article'):
                 content = ""
                 for content_child in article.find('content'):
@@ -61,6 +63,16 @@ def parse_data(xmlfile, max_id=100):
                 data_list.append(a)
 
     df = pd.DataFrame(data_list)
+
+    # Get all the rows with singular categories and the empty categories out
+    drop_indices = []
+    for i in range(1, len(df), 2):
+        if df["categories"][i-1-len(drop_indices)] != df["categories"][i-len(drop_indices)]:
+            drop_indices.append(i-1-len(drop_indices))
+    df = df.drop(drop_indices)
+    df = df.reset_index()
+    drop_indices = [i for i, _ in df.iterrows() if len(df.iloc[i]["categories"]) == 0]
+    df = df.drop(drop_indices)
 
     parse_time = time.time() - start_time
     print(f"Parsing dataset: {xmlfile} took {parse_time} seconds.")
@@ -79,7 +91,7 @@ parser.add_argument("--verbose", type=int, default=2, help="Verbose level (2:deb
 parser.add_argument("--exp_path", type=str, default="", help="Where to store experiment logs and models")
 parser.add_argument("--exp_name", type=str, default="debug", help="Experiment name")
 parser.add_argument("--exp_id", type=str, default="", help="Experiment ID")
-parser.add_argument("--cuda", type=bool_flag, default=False, help="Run on GPU")
+parser.add_argument("--cuda", action="store_true", help="Run on GPU")
 parser.add_argument("--device", type=str, default="cpu", help="Run on GPU or CPU")
 parser.add_argument("--export", type=str, default="", help="Export embeddings after training (txt / pth)")
 # data
@@ -124,6 +136,7 @@ parser.add_argument("--dico_max_size", type=int, default=0, help="Maximum genera
 parser.add_argument("--src_embs", type=str, nargs='+', default=[], help="Reload source embeddings (should be in the same order as in src_langs)")
 parser.add_argument("--tgt_emb", type=str, default="", help="Reload target embeddings")
 parser.add_argument("--normalize_embeddings", type=str, default="", help="Normalize embeddings before training")
+
 
 
 # parse parameters

@@ -1,0 +1,261 @@
+INFO - 06/10/20 15:50:40 - 0:00:00 - ============ Initialized logger ============
+INFO - 06/10/20 15:50:40 - 0:00:00 - adversarial: True
+                                     all_langs: ['nl', 'en']
+                                     batch_size: 32
+                                     cuda: True
+                                     device: cpu
+                                     dico_build: S2T&T2S
+                                     dico_eval: default
+                                     dico_max_rank: 15000
+                                     dico_max_size: 0
+                                     dico_method: csls_knn_10
+                                     dico_min_size: 0
+                                     dico_threshold: 0
+                                     dis_clip_weights: 0
+                                     dis_dropout: 0.0
+                                     dis_hid_dim: 2048
+                                     dis_input_dropout: 0.1
+                                     dis_lambda: 1
+                                     dis_layers: 2
+                                     dis_most_frequent: 0
+                                     dis_optimizer: sgd,lr=0.1
+                                     dis_smooth: 0.1
+                                     dis_steps: 5
+                                     emb_dim: 300
+                                     epoch_size: 4000
+                                     exp_id: 
+                                     exp_name: debug
+                                     exp_path: /home/arjan/Language_Technology_Project/LTP-TopicModel/EmbeddedDocs/dumped/debug/qxsfvoy96m
+                                     export: 
+                                     lr_decay: 0.98
+                                     lr_shrink: 0.5
+                                     map_beta: 0.001
+                                     map_id_init: True
+                                     map_optimizer: sgd,lr=0.1
+                                     max_vocab: -1
+                                     min_lr: 1e-06
+                                     n_epochs: 5
+                                     normalize_embeddings: 
+                                     seed: -1
+                                     src_N: 1
+                                     src_embs: ['data/fasttext-vectors/wiki.nl.vec']
+                                     src_langs: ['nl']
+                                     tgt_emb: data/fasttext-vectors/wiki.en.vec
+                                     tgt_lang: en
+                                     verbose: 2
+INFO - 06/10/20 15:50:40 - 0:00:00 - The experiment will be stored in /home/arjan/Language_Technology_Project/LTP-TopicModel/EmbeddedDocs/dumped/debug/qxsfvoy96m
+INFO - 06/10/20 15:51:59 - 0:01:19 - collecting all words and their counts
+WARNING - 06/10/20 15:51:59 - 0:01:19 - Each 'words' should be a list of words (usually unicode strings). First 'words' here is instead plain <class 'str'>.
+INFO - 06/10/20 15:51:59 - 0:01:19 - PROGRESS: at example #0, processed 0 words (0/s), 0 word types, 0 tags
+INFO - 06/10/20 15:52:00 - 0:01:19 - PROGRESS: at example #10000, processed 7941402 words (11467278/s), 931 word types, 10000 tags
+INFO - 06/10/20 15:52:00 - 0:01:20 - PROGRESS: at example #20000, processed 15953830 words (11985233/s), 1414 word types, 20000 tags
+INFO - 06/10/20 15:52:01 - 0:01:20 - collected 1589 word types and 24259 unique tags from a corpus of 24259 examples and 19437238 words
+INFO - 06/10/20 15:52:01 - 0:01:20 - Loading a fresh vocabulary
+INFO - 06/10/20 15:52:01 - 0:01:20 - effective_min_count=1 retains 1589 unique words (100% of original 1589, drops 0)
+INFO - 06/10/20 15:52:01 - 0:01:20 - effective_min_count=1 leaves 19437238 word corpus (100% of original 19437238, drops 0)
+INFO - 06/10/20 15:52:01 - 0:01:20 - deleting the raw counts dictionary of 1589 items
+INFO - 06/10/20 15:52:01 - 0:01:20 - sample=0.001 downsamples 34 most-common words
+INFO - 06/10/20 15:52:01 - 0:01:20 - downsampling leaves estimated 4704949 word corpus (24.2% of prior 19437238)
+INFO - 06/10/20 15:52:01 - 0:01:20 - estimated required memory for 1589 words and 300 dimensions: 33718900 bytes
+INFO - 06/10/20 15:52:01 - 0:01:20 - resetting layer weights
+INFO - 06/10/20 15:52:05 - 0:01:25 - training model with 4 workers on 1589 vocabulary and 300 features, using sg=0 hs=0 sample=0.001 negative=5 window=2
+INFO - 06/10/20 15:52:07 - 0:01:26 - EPOCH 1 - PROGRESS: at 17.62% examples, 789519 words/s, in_qsize 8, out_qsize 0
+INFO - 06/10/20 15:52:08 - 0:01:27 - EPOCH 1 - PROGRESS: at 34.79% examples, 804779 words/s, in_qsize 7, out_qsize 0
+INFO - 06/10/20 15:52:09 - 0:01:28 - EPOCH 1 - PROGRESS: at 53.18% examples, 817772 words/s, in_qsize 7, out_qsize 0
+INFO - 06/10/20 15:52:10 - 0:01:29 - EPOCH 1 - PROGRESS: at 70.56% examples, 799829 words/s, in_qsize 8, out_qsize 0
+INFO - 06/10/20 15:52:11 - 0:01:30 - EPOCH 1 - PROGRESS: at 86.11% examples, 806528 words/s, in_qsize 8, out_qsize 0
+DEBUG - 06/10/20 15:52:11 - 0:01:31 - job loop exiting, total 2210 jobs
+DEBUG - 06/10/20 15:52:11 - 0:01:31 - worker exiting, processed 563 jobs
+DEBUG - 06/10/20 15:52:11 - 0:01:31 - worker exiting, processed 536 jobs
+INFO - 06/10/20 15:52:11 - 0:01:31 - worker thread finished; awaiting finish of 3 more threads
+INFO - 06/10/20 15:52:11 - 0:01:31 - worker thread finished; awaiting finish of 2 more threads
+DEBUG - 06/10/20 15:52:11 - 0:01:31 - worker exiting, processed 566 jobs
+INFO - 06/10/20 15:52:11 - 0:01:31 - worker thread finished; awaiting finish of 1 more threads
+DEBUG - 06/10/20 15:52:11 - 0:01:31 - worker exiting, processed 545 jobs
+INFO - 06/10/20 15:52:11 - 0:01:31 - worker thread finished; awaiting finish of 0 more threads
+INFO - 06/10/20 15:52:11 - 0:01:31 - EPOCH - 1 : training on 19437238 raw words (4705920 effective words) took 5.8s, 806180 effective words/s
+INFO - 06/10/20 15:52:12 - 0:01:32 - EPOCH 2 - PROGRESS: at 17.49% examples, 782137 words/s, in_qsize 7, out_qsize 0
+INFO - 06/10/20 15:52:13 - 0:01:33 - EPOCH 2 - PROGRESS: at 33.98% examples, 788352 words/s, in_qsize 8, out_qsize 0
+INFO - 06/10/20 15:52:14 - 0:01:34 - EPOCH 2 - PROGRESS: at 52.46% examples, 805617 words/s, in_qsize 7, out_qsize 0
+INFO - 06/10/20 15:52:15 - 0:01:35 - EPOCH 2 - PROGRESS: at 71.46% examples, 810235 words/s, in_qsize 7, out_qsize 0
+INFO - 06/10/20 15:52:16 - 0:01:36 - EPOCH 2 - PROGRESS: at 88.32% examples, 824339 words/s, in_qsize 8, out_qsize 0
+DEBUG - 06/10/20 15:52:17 - 0:01:37 - job loop exiting, total 2210 jobs
+DEBUG - 06/10/20 15:52:17 - 0:01:37 - worker exiting, processed 556 jobs
+INFO - 06/10/20 15:52:17 - 0:01:37 - worker thread finished; awaiting finish of 3 more threads
+DEBUG - 06/10/20 15:52:17 - 0:01:37 - worker exiting, processed 567 jobs
+INFO - 06/10/20 15:52:17 - 0:01:37 - worker thread finished; awaiting finish of 2 more threads
+DEBUG - 06/10/20 15:52:17 - 0:01:37 - worker exiting, processed 552 jobs
+INFO - 06/10/20 15:52:17 - 0:01:37 - worker thread finished; awaiting finish of 1 more threads
+DEBUG - 06/10/20 15:52:17 - 0:01:37 - worker exiting, processed 535 jobs
+INFO - 06/10/20 15:52:17 - 0:01:37 - worker thread finished; awaiting finish of 0 more threads
+INFO - 06/10/20 15:52:17 - 0:01:37 - EPOCH - 2 : training on 19437238 raw words (4703927 effective words) took 5.7s, 828364 effective words/s
+INFO - 06/10/20 15:52:18 - 0:01:38 - EPOCH 3 - PROGRESS: at 18.00% examples, 807430 words/s, in_qsize 7, out_qsize 0
+INFO - 06/10/20 15:52:19 - 0:01:39 - EPOCH 3 - PROGRESS: at 35.45% examples, 820045 words/s, in_qsize 7, out_qsize 0
+INFO - 06/10/20 15:52:20 - 0:01:40 - EPOCH 3 - PROGRESS: at 53.66% examples, 820669 words/s, in_qsize 7, out_qsize 0
+INFO - 06/10/20 15:52:21 - 0:01:41 - EPOCH 3 - PROGRESS: at 72.02% examples, 816540 words/s, in_qsize 7, out_qsize 1
+INFO - 06/10/20 15:52:22 - 0:01:42 - EPOCH 3 - PROGRESS: at 87.09% examples, 814019 words/s, in_qsize 8, out_qsize 0
+DEBUG - 06/10/20 15:52:23 - 0:01:42 - job loop exiting, total 2210 jobs
+DEBUG - 06/10/20 15:52:23 - 0:01:42 - worker exiting, processed 544 jobs
+INFO - 06/10/20 15:52:23 - 0:01:42 - worker thread finished; awaiting finish of 3 more threads
+DEBUG - 06/10/20 15:52:23 - 0:01:42 - worker exiting, processed 543 jobs
+INFO - 06/10/20 15:52:23 - 0:01:42 - worker thread finished; awaiting finish of 2 more threads
+DEBUG - 06/10/20 15:52:23 - 0:01:42 - worker exiting, processed 556 jobs
+INFO - 06/10/20 15:52:23 - 0:01:42 - worker thread finished; awaiting finish of 1 more threads
+DEBUG - 06/10/20 15:52:23 - 0:01:42 - worker exiting, processed 567 jobs
+INFO - 06/10/20 15:52:23 - 0:01:42 - worker thread finished; awaiting finish of 0 more threads
+INFO - 06/10/20 15:52:23 - 0:01:42 - EPOCH - 3 : training on 19437238 raw words (4704702 effective words) took 5.8s, 812093 effective words/s
+INFO - 06/10/20 15:52:24 - 0:01:43 - EPOCH 4 - PROGRESS: at 18.17% examples, 813239 words/s, in_qsize 8, out_qsize 0
+INFO - 06/10/20 15:52:25 - 0:01:44 - EPOCH 4 - PROGRESS: at 35.35% examples, 818129 words/s, in_qsize 7, out_qsize 0
+INFO - 06/10/20 15:52:26 - 0:01:45 - EPOCH 4 - PROGRESS: at 53.18% examples, 816528 words/s, in_qsize 8, out_qsize 0
+INFO - 06/10/20 15:52:27 - 0:01:46 - EPOCH 4 - PROGRESS: at 71.00% examples, 804019 words/s, in_qsize 7, out_qsize 0
+INFO - 06/10/20 15:52:28 - 0:01:47 - EPOCH 4 - PROGRESS: at 87.06% examples, 813304 words/s, in_qsize 8, out_qsize 0
+DEBUG - 06/10/20 15:52:29 - 0:01:48 - job loop exiting, total 2210 jobs
+DEBUG - 06/10/20 15:52:29 - 0:01:48 - worker exiting, processed 562 jobs
+INFO - 06/10/20 15:52:29 - 0:01:48 - worker thread finished; awaiting finish of 3 more threads
+DEBUG - 06/10/20 15:52:29 - 0:01:48 - worker exiting, processed 545 jobs
+INFO - 06/10/20 15:52:29 - 0:01:48 - worker thread finished; awaiting finish of 2 more threads
+DEBUG - 06/10/20 15:52:29 - 0:01:48 - worker exiting, processed 542 jobs
+INFO - 06/10/20 15:52:29 - 0:01:48 - worker thread finished; awaiting finish of 1 more threads
+DEBUG - 06/10/20 15:52:29 - 0:01:48 - worker exiting, processed 561 jobs
+INFO - 06/10/20 15:52:29 - 0:01:48 - worker thread finished; awaiting finish of 0 more threads
+INFO - 06/10/20 15:52:29 - 0:01:48 - EPOCH - 4 : training on 19437238 raw words (4705297 effective words) took 5.8s, 810715 effective words/s
+INFO - 06/10/20 15:52:30 - 0:01:49 - EPOCH 5 - PROGRESS: at 17.66% examples, 794820 words/s, in_qsize 8, out_qsize 0
+INFO - 06/10/20 15:52:31 - 0:01:50 - EPOCH 5 - PROGRESS: at 34.70% examples, 802865 words/s, in_qsize 7, out_qsize 0
+INFO - 06/10/20 15:52:32 - 0:01:51 - EPOCH 5 - PROGRESS: at 52.67% examples, 809433 words/s, in_qsize 7, out_qsize 0
+INFO - 06/10/20 15:52:33 - 0:01:52 - EPOCH 5 - PROGRESS: at 70.97% examples, 806207 words/s, in_qsize 8, out_qsize 0
+INFO - 06/10/20 15:52:34 - 0:01:53 - EPOCH 5 - PROGRESS: at 87.28% examples, 816287 words/s, in_qsize 7, out_qsize 0
+DEBUG - 06/10/20 15:52:34 - 0:01:54 - job loop exiting, total 2210 jobs
+DEBUG - 06/10/20 15:52:34 - 0:01:54 - worker exiting, processed 573 jobs
+INFO - 06/10/20 15:52:34 - 0:01:54 - worker thread finished; awaiting finish of 3 more threads
+DEBUG - 06/10/20 15:52:34 - 0:01:54 - worker exiting, processed 534 jobs
+DEBUG - 06/10/20 15:52:34 - 0:01:54 - worker exiting, processed 547 jobs
+INFO - 06/10/20 15:52:34 - 0:01:54 - worker thread finished; awaiting finish of 2 more threads
+INFO - 06/10/20 15:52:34 - 0:01:54 - worker thread finished; awaiting finish of 1 more threads
+DEBUG - 06/10/20 15:52:34 - 0:01:54 - worker exiting, processed 556 jobs
+INFO - 06/10/20 15:52:34 - 0:01:54 - worker thread finished; awaiting finish of 0 more threads
+INFO - 06/10/20 15:52:34 - 0:01:54 - EPOCH - 5 : training on 19437238 raw words (4708214 effective words) took 5.8s, 818317 effective words/s
+INFO - 06/10/20 15:52:34 - 0:01:54 - training on a 97186190 raw words (23528060 effective words) took 28.9s, 814878 effective words/s
+INFO - 06/10/20 15:52:34 - 0:01:54 - collecting all words and their counts
+WARNING - 06/10/20 15:52:34 - 0:01:54 - Each 'words' should be a list of words (usually unicode strings). First 'words' here is instead plain <class 'str'>.
+INFO - 06/10/20 15:52:34 - 0:01:54 - PROGRESS: at example #0, processed 0 words (0/s), 0 word types, 0 tags
+INFO - 06/10/20 15:52:35 - 0:01:54 - PROGRESS: at example #10000, processed 2396065 words (10283848/s), 562 word types, 10000 tags
+INFO - 06/10/20 15:52:35 - 0:01:55 - PROGRESS: at example #20000, processed 4921453 words (10484683/s), 736 word types, 20000 tags
+INFO - 06/10/20 15:52:35 - 0:01:55 - collected 826 word types and 24137 unique tags from a corpus of 24137 examples and 6035095 words
+INFO - 06/10/20 15:52:35 - 0:01:55 - Loading a fresh vocabulary
+INFO - 06/10/20 15:52:35 - 0:01:55 - effective_min_count=1 retains 826 unique words (100% of original 826, drops 0)
+INFO - 06/10/20 15:52:35 - 0:01:55 - effective_min_count=1 leaves 6035095 word corpus (100% of original 6035095, drops 0)
+INFO - 06/10/20 15:52:35 - 0:01:55 - deleting the raw counts dictionary of 826 items
+INFO - 06/10/20 15:52:35 - 0:01:55 - sample=0.001 downsamples 36 most-common words
+INFO - 06/10/20 15:52:35 - 0:01:55 - downsampling leaves estimated 1474642 word corpus (24.4% of prior 6035095)
+INFO - 06/10/20 15:52:35 - 0:01:55 - estimated required memory for 826 words and 300 dimensions: 31359800 bytes
+INFO - 06/10/20 15:52:35 - 0:01:55 - resetting layer weights
+INFO - 06/10/20 15:52:40 - 0:02:00 - training model with 4 workers on 826 vocabulary and 300 features, using sg=0 hs=0 sample=0.001 negative=5 window=2
+INFO - 06/10/20 15:52:41 - 0:02:01 - EPOCH 1 - PROGRESS: at 35.31% examples, 504664 words/s, in_qsize 8, out_qsize 0
+INFO - 06/10/20 15:52:42 - 0:02:02 - EPOCH 1 - PROGRESS: at 70.63% examples, 508085 words/s, in_qsize 7, out_qsize 0
+DEBUG - 06/10/20 15:52:43 - 0:02:03 - job loop exiting, total 661 jobs
+DEBUG - 06/10/20 15:52:43 - 0:02:03 - worker exiting, processed 167 jobs
+INFO - 06/10/20 15:52:43 - 0:02:03 - worker thread finished; awaiting finish of 3 more threads
+DEBUG - 06/10/20 15:52:43 - 0:02:03 - worker exiting, processed 165 jobs
+INFO - 06/10/20 15:52:43 - 0:02:03 - worker thread finished; awaiting finish of 2 more threads
+DEBUG - 06/10/20 15:52:43 - 0:02:03 - worker exiting, processed 162 jobs
+INFO - 06/10/20 15:52:43 - 0:02:03 - worker thread finished; awaiting finish of 1 more threads
+DEBUG - 06/10/20 15:52:43 - 0:02:03 - worker exiting, processed 167 jobs
+INFO - 06/10/20 15:52:43 - 0:02:03 - worker thread finished; awaiting finish of 0 more threads
+INFO - 06/10/20 15:52:43 - 0:02:03 - EPOCH - 1 : training on 6035095 raw words (1497705 effective words) took 2.9s, 524713 effective words/s
+INFO - 06/10/20 15:52:44 - 0:02:04 - EPOCH 2 - PROGRESS: at 35.51% examples, 507895 words/s, in_qsize 7, out_qsize 0
+INFO - 06/10/20 15:52:45 - 0:02:05 - EPOCH 2 - PROGRESS: at 70.75% examples, 508504 words/s, in_qsize 7, out_qsize 0
+DEBUG - 06/10/20 15:52:46 - 0:02:06 - job loop exiting, total 661 jobs
+DEBUG - 06/10/20 15:52:46 - 0:02:06 - worker exiting, processed 168 jobs
+INFO - 06/10/20 15:52:46 - 0:02:06 - worker thread finished; awaiting finish of 3 more threads
+DEBUG - 06/10/20 15:52:46 - 0:02:06 - worker exiting, processed 164 jobs
+INFO - 06/10/20 15:52:46 - 0:02:06 - worker thread finished; awaiting finish of 2 more threads
+DEBUG - 06/10/20 15:52:46 - 0:02:06 - worker exiting, processed 166 jobs
+INFO - 06/10/20 15:52:46 - 0:02:06 - worker thread finished; awaiting finish of 1 more threads
+DEBUG - 06/10/20 15:52:46 - 0:02:06 - worker exiting, processed 163 jobs
+INFO - 06/10/20 15:52:46 - 0:02:06 - worker thread finished; awaiting finish of 0 more threads
+INFO - 06/10/20 15:52:46 - 0:02:06 - EPOCH - 2 : training on 6035095 raw words (1498201 effective words) took 2.9s, 524530 effective words/s
+INFO - 06/10/20 15:52:47 - 0:02:07 - EPOCH 3 - PROGRESS: at 35.31% examples, 505616 words/s, in_qsize 8, out_qsize 0
+INFO - 06/10/20 15:52:48 - 0:02:08 - EPOCH 3 - PROGRESS: at 70.73% examples, 507825 words/s, in_qsize 7, out_qsize 0
+DEBUG - 06/10/20 15:52:49 - 0:02:08 - job loop exiting, total 661 jobs
+DEBUG - 06/10/20 15:52:49 - 0:02:08 - worker exiting, processed 163 jobs
+INFO - 06/10/20 15:52:49 - 0:02:08 - worker thread finished; awaiting finish of 3 more threads
+DEBUG - 06/10/20 15:52:49 - 0:02:08 - worker exiting, processed 161 jobs
+DEBUG - 06/10/20 15:52:49 - 0:02:08 - worker exiting, processed 172 jobs
+INFO - 06/10/20 15:52:49 - 0:02:08 - worker thread finished; awaiting finish of 2 more threads
+DEBUG - 06/10/20 15:52:49 - 0:02:08 - worker exiting, processed 165 jobs
+INFO - 06/10/20 15:52:49 - 0:02:08 - worker thread finished; awaiting finish of 1 more threads
+INFO - 06/10/20 15:52:49 - 0:02:08 - worker thread finished; awaiting finish of 0 more threads
+INFO - 06/10/20 15:52:49 - 0:02:08 - EPOCH - 3 : training on 6035095 raw words (1499022 effective words) took 2.9s, 524511 effective words/s
+INFO - 06/10/20 15:52:50 - 0:02:09 - EPOCH 4 - PROGRESS: at 34.00% examples, 487074 words/s, in_qsize 8, out_qsize 0
+INFO - 06/10/20 15:52:51 - 0:02:10 - EPOCH 4 - PROGRESS: at 63.15% examples, 456845 words/s, in_qsize 7, out_qsize 0
+INFO - 06/10/20 15:52:52 - 0:02:11 - EPOCH 4 - PROGRESS: at 97.58% examples, 486011 words/s, in_qsize 8, out_qsize 0
+DEBUG - 06/10/20 15:52:52 - 0:02:11 - job loop exiting, total 661 jobs
+DEBUG - 06/10/20 15:52:52 - 0:02:12 - worker exiting, processed 167 jobs
+INFO - 06/10/20 15:52:52 - 0:02:12 - worker thread finished; awaiting finish of 3 more threads
+DEBUG - 06/10/20 15:52:52 - 0:02:12 - worker exiting, processed 168 jobs
+INFO - 06/10/20 15:52:52 - 0:02:12 - worker thread finished; awaiting finish of 2 more threads
+DEBUG - 06/10/20 15:52:52 - 0:02:12 - worker exiting, processed 163 jobs
+INFO - 06/10/20 15:52:52 - 0:02:12 - worker thread finished; awaiting finish of 1 more threads
+DEBUG - 06/10/20 15:52:52 - 0:02:12 - worker exiting, processed 163 jobs
+INFO - 06/10/20 15:52:52 - 0:02:12 - worker thread finished; awaiting finish of 0 more threads
+INFO - 06/10/20 15:52:52 - 0:02:12 - EPOCH - 4 : training on 6035095 raw words (1499362 effective words) took 3.1s, 488391 effective words/s
+INFO - 06/10/20 15:52:53 - 0:02:13 - EPOCH 5 - PROGRESS: at 35.50% examples, 505614 words/s, in_qsize 8, out_qsize 0
+INFO - 06/10/20 15:52:54 - 0:02:14 - EPOCH 5 - PROGRESS: at 69.07% examples, 494698 words/s, in_qsize 7, out_qsize 0
+DEBUG - 06/10/20 15:52:55 - 0:02:14 - job loop exiting, total 661 jobs
+DEBUG - 06/10/20 15:52:55 - 0:02:14 - worker exiting, processed 165 jobs
+INFO - 06/10/20 15:52:55 - 0:02:14 - worker thread finished; awaiting finish of 3 more threads
+DEBUG - 06/10/20 15:52:55 - 0:02:14 - worker exiting, processed 163 jobs
+INFO - 06/10/20 15:52:55 - 0:02:14 - worker thread finished; awaiting finish of 2 more threads
+DEBUG - 06/10/20 15:52:55 - 0:02:14 - worker exiting, processed 168 jobs
+INFO - 06/10/20 15:52:55 - 0:02:14 - worker thread finished; awaiting finish of 1 more threads
+DEBUG - 06/10/20 15:52:55 - 0:02:14 - worker exiting, processed 165 jobs
+INFO - 06/10/20 15:52:55 - 0:02:14 - worker thread finished; awaiting finish of 0 more threads
+INFO - 06/10/20 15:52:55 - 0:02:14 - EPOCH - 5 : training on 6035095 raw words (1498890 effective words) took 3.0s, 504651 effective words/s
+INFO - 06/10/20 15:52:55 - 0:02:14 - training on a 30175475 raw words (7493180 effective words) took 14.6s, 512650 effective words/s
+INFO - 06/10/20 15:53:59 - 0:03:19 - ----> MULTILINGUAL ADVERSARIAL TRAINING <----
+                                     
+                                     
+INFO - 06/10/20 15:53:59 - 0:03:19 - Starting adversarial training epoch 0...
+INFO - 06/10/20 15:54:00 - 0:03:20 - 000000 - Discriminator loss: 1.3840 - 45 samples/s
+INFO - 06/10/20 15:57:26 - 0:06:46 - __log__:{"n_epoch": 0, "purity": 0.054113185018700286}
+INFO - 06/10/20 15:57:26 - 0:06:46 - * Best value for "purity": 0.05411
+INFO - 06/10/20 15:57:26 - 0:06:46 - * Saving the nl to en mapping to /home/arjan/Language_Technology_Project/LTP-TopicModel/EmbeddedDocs/dumped/debug/qxsfvoy96m/best_mapping_nl2en.t7 ...
+INFO - 06/10/20 15:57:26 - 0:06:46 - End of epoch 0.
+                                     
+                                     
+INFO - 06/10/20 15:57:26 - 0:06:46 - Decreasing learning rate: 0.10000000 -> 0.09800000
+INFO - 06/10/20 15:57:26 - 0:06:46 - Starting adversarial training epoch 1...
+INFO - 06/10/20 15:57:27 - 0:06:46 - 000000 - Discriminator loss: 1.2955 - 105 samples/s
+INFO - 06/10/20 16:01:16 - 0:10:36 - __log__:{"n_epoch": 1, "purity": 0.05407104352864743}
+INFO - 06/10/20 16:01:16 - 0:10:36 - End of epoch 1.
+                                     
+                                     
+INFO - 06/10/20 16:01:16 - 0:10:36 - Decreasing learning rate: 0.09800000 -> 0.09604000
+INFO - 06/10/20 16:01:16 - 0:10:36 - Validation metric is smaller than the best: 0.05407 vs 0.05411
+INFO - 06/10/20 16:01:16 - 0:10:36 - Starting adversarial training epoch 2...
+INFO - 06/10/20 16:01:17 - 0:10:36 - 000000 - Discriminator loss: 1.3504 - 104 samples/s
+INFO - 06/10/20 16:05:08 - 0:14:27 - __log__:{"n_epoch": 2, "purity": 0.054035925620270056}
+INFO - 06/10/20 16:05:08 - 0:14:27 - End of epoch 2.
+                                     
+                                     
+INFO - 06/10/20 16:05:08 - 0:14:27 - Decreasing learning rate: 0.09604000 -> 0.09411920
+INFO - 06/10/20 16:05:08 - 0:14:27 - Validation metric is smaller than the best: 0.05404 vs 0.05411
+INFO - 06/10/20 16:05:08 - 0:14:27 - Shrinking the learning rate: 0.09412 -> 0.04706
+INFO - 06/10/20 16:05:08 - 0:14:27 - Starting adversarial training epoch 3...
+INFO - 06/10/20 16:05:08 - 0:14:28 - 000000 - Discriminator loss: 1.3177 - 117 samples/s
+INFO - 06/10/20 16:08:43 - 0:18:03 - __log__:{"n_epoch": 3, "purity": 0.05359343997471511}
+INFO - 06/10/20 16:08:43 - 0:18:03 - End of epoch 3.
+                                     
+                                     
+INFO - 06/10/20 16:08:43 - 0:18:03 - Decreasing learning rate: 0.04705960 -> 0.04611841
+INFO - 06/10/20 16:08:43 - 0:18:03 - Validation metric is smaller than the best: 0.05359 vs 0.05411
+INFO - 06/10/20 16:08:43 - 0:18:03 - Shrinking the learning rate: 0.04612 -> 0.02306
+INFO - 06/10/20 16:08:43 - 0:18:03 - Starting adversarial training epoch 4...
+INFO - 06/10/20 16:08:44 - 0:18:04 - 000000 - Discriminator loss: 1.3490 - 101 samples/s
+INFO - 06/10/20 16:12:34 - 0:21:54 - __log__:{"n_epoch": 4, "purity": 0.05365314041895665}
+INFO - 06/10/20 16:12:34 - 0:21:54 - End of epoch 4.
+                                     
+                                     
+INFO - 06/10/20 16:12:34 - 0:21:54 - Decreasing learning rate: 0.02305920 -> 0.02259802
+INFO - 06/10/20 16:12:34 - 0:21:54 - Validation metric is smaller than the best: 0.05365 vs 0.05411
+INFO - 06/10/20 16:12:34 - 0:21:54 - Shrinking the learning rate: 0.02260 -> 0.01130
