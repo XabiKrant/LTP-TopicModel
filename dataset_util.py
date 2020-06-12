@@ -17,6 +17,8 @@ def process_dataset(xmlfile, n_documents, topNcats):
                This is used as input for parse_data
     n_documents -- The maximal number of documents we want
                 This is also used as input for parse_data
+    topNcats -- The number of categories we want there to be
+                in the dataset. We pick the most common N.
 
     returns:
     df_english -- The English part of the dataframe
@@ -89,14 +91,22 @@ def parse_data(xmlfile, max_id=10000):
 
 def take_top_N_categories(df, N=300):
     """This function removes rows from the dataframe that
-    do not have a category that is in the top 500 categories.
+    do not have a category that is in the top N categories.
     Then this function also removes the categories from the
-    remaining rows such that only categories from the top 500 remain.
+    remaining rows such that only categories from the top N remain.
+    
+    args:
+    df -- A DataFrame object which needs to be edited.
+    N -- The number of categories we want there to be in the dataset.
+
+    returns:
+    df -- The input df but with N categories, such that categories
+          not in the top N do not exist anymore.
+
     """
     counts = {}
     for i, row in df.iterrows():
         cats = row["categories"]
-        # counts[cat] += 1 for cat in cats if cat in counts else counts[cat] = 0
         for cat in cats:
             if cat in counts:
                 counts[cat] += 1
@@ -143,7 +153,7 @@ def construct_stopwords():
     stopwords.extend(get_stop_words('nl'))
     stopcode = ["div", "class", "id", "href", "align", "left", "right", "body", "title", "head",
                 "h1", "h2", "h3", "h4", "h5", "h6", "hr", "br", "html", "img", "jpg", "li", "ol", "ul",
-                "p", "attribute", "tag", "style"]
+                "p", "attribute", "tag", "style", "rowspan"]
     stopwords.extend(stopcode)
     for i in range(2020):
         # Remove all numerals as well, mostly years
