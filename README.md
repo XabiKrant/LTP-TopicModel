@@ -13,6 +13,8 @@ If this URL does not work, please try to download the English-Dutch dataset from
 It is imperative that this dataset is put in a directory called Data. The location for this dataset is hardcoded in the code.  
 
 ## Running
+
+### LDA
 When running this program, either the LDA version or the Neural approach version, please keep in mind that parsing the dataset will take some time. On our machines, this usually takes around 70-80 seconds.
 
 To run the LDA implementation, use the following command:
@@ -25,11 +27,12 @@ To run the LDA implementation with embeddings (NOTE: The downloads of these embe
 python3 lda.py --embeddings
 ```
 
-To train and test the neural approach, use the following command, with --cuda if you would like to use your GPU:
+### Feature based neural approach
+To train and test the feature based neural approach and doc2vec models, use the following command, with --cuda if you would like to use your GPU:
 ```bash
 python3 network.py --train [--cuda]
 ```
-The command above will also save the network, so if you want to just test that network, you can do so with:
+The command above will also save the network and doc2vec models, so if you want to just test them, you can do so with:
 ```bash
 python3 network.py [--cuda]
 ```

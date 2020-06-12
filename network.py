@@ -129,13 +129,13 @@ def test(
     purity = compute_purity(kmeans, args.n_topics, categories_both)
     purity_star = compute_purity_star(kmeans, args.n_topics, categories_both)
     print(f"The purity of the made clusters is {purity:.3f}\n"
-          f" The purity* of the made clusters is {purity_star:.3f}")
+          f"The purity* of the made clusters is {purity_star:.3f}")
 
 def main():
     program_start_time = time.time()
 
     parser = argparse.ArgumentParser("A neural network which makes use of document embeddings as input.")
-    parser.add_argument("--vector_length", type=int, default=100, help="The length of the document embedding vectors.")
+    parser.add_argument("--vector_length", type=int, default=300, help="The length of the document embedding vectors.")
     parser.add_argument("--n_topics", type=int, default=50, help="The number of clusters the KMeans should make.")
     parser.add_argument("--train", action="store_true")
     parser.add_argument("--n_epochs", type=int, default=10, help="The number of epochs the network should train if --train is specified.")
